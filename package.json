@@ -1,0 +1,19 @@
+{
+  "name": "Demo_Project",
+  "version": "0.0.1",
+  "private": true,
+  "scripts": {
+    "start": "node node_modules/react-native/local-cli/cli.js start"
+  },
+  "dependencies": {
+    "lodash": "^4.17.11",
+    "native-base": "^2.12.1",
+    "react": "16.8.3",
+    "react-native": "0.59.2",
+    "react-native-gesture-handler": "^1.1.0",
+    "react-native-pdf": "^5.0.12",
+    "react-native-vector-icons": "^6.4.2",
+    "react-navigation": "^3.6.0",
+    "rn-fetch-blob": "^0.10.15"
+  }
+}
