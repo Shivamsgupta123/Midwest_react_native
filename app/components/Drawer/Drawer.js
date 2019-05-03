@@ -1,13 +1,51 @@
 import React, { Component } from "react";
-import { View, Text, Image } from "react-native";
+import { View, Text, Image, AsyncStorage } from "react-native";
 import styles from "./Styles";
 import { TouchableOpacity } from "react-native-gesture-handler";
+import Loader from "../Loader/Loader";
 
 export default class NoticeBoard extends Component {
   constructor(props) {
     super(props);
-    this.state = {};
+    this.state = {
+      Data: [],
+      Loading: false
+    };
+    this.UserInfo = "";
   }
+  async componentDidMount() {
+    this.UserInfo = JSON.parse(await AsyncStorage.getItem("UserInfo"));
+    this.fetchResult();
+  }
+  async fetchResult() {
+    console.log("USER INFO", this.UserInfo);
+    this.setState({ Loading: true });
+    var url =
+      "https://www.scmcentral.com.au/webservices_midwest/myscmapp/profile_products.php?code=" +
+      this.UserInfo.Debtorid +
+      "&page=1&limit=1500&warehouse=" +
+      this.UserInfo.warehouse;
+    console.log("pantrylist url", url);
+    fetch(url)
+      .then(response => response.json())
+      .then(response => {
+        if (response.profilecount != 0) {
+          this.setState({
+            Data: response.profile,
+            Loading: false
+          });
+          console.log("drawer data", this.state.Data);
+        } else {
+          this.setState({ Loading: false });
+        }
+      })
+      .catch(error => {
+        this.setState({ Loading: false });
+        alert("Try again Later");
+        console.log(error);
+      });
+  }
+
   render() {
     return (
       <View style={styles.Container}>
@@ -27,20 +65,31 @@ export default class NoticeBoard extends Component {
           </TouchableOpacity>
         </View>
         <View style={styles.ImageContainer}>
-          <TouchableOpacity
-            style={{
-              alignItems: "center"
-            }}
-            onPress={() => this.props.navigation.navigate("PantryList")}
-          >
-            <Image
-              style={styles.Icon}
-              source={require("../../assets/Images/profile.png")}
-            />
-            <Text style={{ marginTop: 10, color: "white", fontWeight: "800" }}>
-              Pantry List
-            </Text>
-          </TouchableOpacity>
+          {this.state.Loading ? (
+            <Loader isGreen={true} />
+          ) : (
+            <TouchableOpacity
+              style={{
+                alignItems: "center"
+              }}
+              onPress={() =>
+                this.props.navigation.navigate(
+                  "PantryListDragable",
+                  this.state.Data
+                )
+              } //PantryList
+            >
+              <Image
+                style={styles.Icon}
+                source={require("../../assets/Images/profile.png")}
+              />
+              <Text
+                style={{ marginTop: 10, color: "white", fontWeight: "800" }}
+              >
+                Pantry List
+              </Text>
+            </TouchableOpacity>
+          )}
         </View>
         <View style={styles.ImageContainer}>
           <TouchableOpacity

@@ -3,6 +3,7 @@ package com.demo_project;
 import android.app.Application;
 
 import com.facebook.react.ReactApplication;
+import io.realm.react.RealmReactPackage;
 import com.rumax.reactnative.pdfviewer.PDFViewPackage;
 import com.RNFetchBlob.RNFetchBlobPackage;
 import org.wonday.pdf.RCTPdfView;
@@ -28,6 +29,7 @@ public class MainApplication extends Application implements ReactApplication {
     protected List<ReactPackage> getPackages() {
       return Arrays.<ReactPackage>asList(
           new MainReactPackage(),
+            new RealmReactPackage(),
             new PDFViewPackage(),
             new RNFetchBlobPackage(),
             new RCTPdfView(),

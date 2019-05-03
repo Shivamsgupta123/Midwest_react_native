@@ -7,7 +7,7 @@ import React, { Component } from "react";
 import { Text, View, Alert } from "react-native";
 import Header from "../../Header/Header";
 import styles from "./styles";
-
+const Realm = require("realm");
 /**
  * Cart class
  * @class
@@ -15,7 +15,45 @@ import styles from "./styles";
 class Cart extends Component {
   constructor(props) {
     super(props);
-    this.state = {};
+
+    this.ProductSchema = {
+      name: "Product",
+      properties: {
+        ALT_UNITS: "string",
+        AVAILABLE: "string",
+        BRAND: "string",
+        CODE: "string",
+        CONVERSATION_FACTOR: "string",
+        DESCRIPTION: "string",
+        DISCOUNT: "string",
+        LOCATION: "string",
+        ON_HAND: "string",
+        ORIGINAL_PRICE: "string",
+        PICTURE_FIELD: "string",
+        PRICE1: "string",
+        PROD_CLASS: "string",
+        PROD_GROUP: "string",
+        REWARDS: "string",
+        SUBSTITUTE: "string",
+        TAX_CODE1: "string",
+        UNITS: "string",
+        WAREHOUSE: "string",
+        WEIGHT_SENSITIVE: "string",
+        flag_cc: "int",
+        QUANTITY: "int"
+      }
+    };
+  }
+
+  componentDidMount() {
+    console.log("8");
+    Realm.open({ schema: [this.ProductSchema] })
+      .then(realm => {
+        console.log("realm.length", realm);
+      })
+      .catch(error => {
+        console.log("realm error", error);
+      });
   }
 
   render() {

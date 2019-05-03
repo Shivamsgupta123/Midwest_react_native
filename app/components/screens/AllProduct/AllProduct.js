@@ -20,11 +20,12 @@ import Loader from "../../Loader/Loader";
 import ProductRow from "../ProductRow";
 import _ from "lodash";
 import styles from "./styles";
-
+const Realm = require("realm");
 /**
  * AllProduct class
  * @class
  */
+
 class AllProduct extends Component {
   constructor(props) {
     super(props);
@@ -36,8 +37,37 @@ class AllProduct extends Component {
       MaxPage: "",
       Page: 1,
       Limit: 0,
-      Search: false
+      Search: false,
+      realm: null
     };
+    this.ProductSchema = {
+      name: "Product",
+      properties: {
+        ALT_UNITS: "string",
+        AVAILABLE: "string",
+        BRAND: "string",
+        CODE: "string",
+        CONVERSATION_FACTOR: "string",
+        DESCRIPTION: "string",
+        DISCOUNT: "string",
+        LOCATION: "string",
+        ON_HAND: "string",
+        ORIGINAL_PRICE: "string",
+        PICTURE_FIELD: "string",
+        PRICE1: "string",
+        PROD_CLASS: "string",
+        PROD_GROUP: "string",
+        REWARDS: "string",
+        SUBSTITUTE: "string",
+        TAX_CODE1: "string",
+        UNITS: "string",
+        WAREHOUSE: "string",
+        WEIGHT_SENSITIVE: "string",
+        flag_cc: "int",
+        QUANTITY: "int"
+      }
+    };
+
     this.UserInfo = "";
     this.productsArray = [];
     this.index = -1;
@@ -66,6 +96,7 @@ class AllProduct extends Component {
       QUANTITY: ""
     };
   }
+
   async componentDidMount() {
     this.UserInfo = JSON.parse(await AsyncStorage.getItem("UserInfo"));
     this.fetchResult();
@@ -83,7 +114,7 @@ class AllProduct extends Component {
     if (this.state.Limit <= this.state.TotalProduct) {
       console.log("fetched called");
       this.setState({ Loading: true });
-      const { TotalProduct, MaxPage, Page } = this.state;
+
       var url =
         "https://www.scmcentral.com.au/webservices_midwest/myscmapp/list_products_new.php?code=" +
         this.UserInfo.Debtorid +
@@ -143,35 +174,72 @@ class AllProduct extends Component {
 
   editQty(products, QTY) {
     console.log("All product increase qty", products, QTY);
-    this.products.ALT_UNITS = products.ALT_UNITS;
-    this.products.AVAILABLE = products.AVAILABLE;
-    this.products.BRAND = products.BRAND;
-    this.products.CODE = products.CODE;
-    this.products.CONVERSATION_FACTOR = products.CONVERSATION_FACTOR;
-    this.products.DESCRIPTION = products.DESCRIPTION;
-    this.products.DISCOUNT = products.DISCOUNT;
-    this.products.LOCATION = products.LOCATION;
-    this.products.ON_HAND = products.ON_HAND;
-    this.products.ORIGINAL_PRICE = products.ORIGINAL_PRICE;
-    this.products.PICTURE_FIELD = products.PICTURE_FIELD;
-    this.products.PRICE1 = products.PRICE1;
-    this.products.PROD_CLASS = products.PROD_CLASS;
-    this.products.PROD_GROUP = products.PROD_GROUP;
-    this.products.REWARDS = products.REWARDS;
-    this.products.SUBSTITUTE = products.SUBSTITUTE;
-    this.products.TAX_CODE1 = products.TAX_CODE1;
-    this.products.UNITS = products.UNITS;
-    this.products.WAREHOUSE = products.WAREHOUSE;
-    this.products.WEIGHT_SENSITIVE = products.WEIGHT_SENSITIVE;
-    this.products.flag_cc = products.flag_cc;
-    this.products.QUANTITY = QTY;
 
-    this.productsArray = this.productsArray.concat(this.products);
-    console.log("productsArray", this.productsArray);
-    this.index = _.findIndex(this.productsArray, function(o) {
-      return o.DESCRIPTION == products.DESCRIPTION;
-    });
-    console.log("index of repeated product:  ", this.index);
+    Realm.open({ schema: [this.ProductSchema] })
+      .then(realm => {
+        // Create Realm objects and write to local storage
+        realm.write(() => {
+          const myProduct = realm.create("Product", {
+            ALT_UNITS: products.ALT_UNITS,
+            AVAILABLE: products.AVAILABLE,
+            BRAND: products.BRAND,
+            CODE: products.CODE,
+            CONVERSATION_FACTOR: products.CONVERSATION_FACTOR,
+            DESCRIPTION: products.DESCRIPTION,
+            DISCOUNT: products.DISCOUNT,
+            LOCATION: products.LOCATION,
+            ON_HAND: products.ON_HAND,
+            ORIGINAL_PRICE: products.ORIGINAL_PRICE,
+            PICTURE_FIELD: products.PICTURE_FIELD,
+            PRICE1: products.PRICE1,
+            PROD_CLASS: products.PROD_CLASS,
+            PROD_GROUP: products.PROD_GROUP,
+            REWARDS: products.REWARDS,
+            SUBSTITUTE: products.SUBSTITUTE,
+            TAX_CODE1: products.TAX_CODE1,
+            UNITS: products.UNITS,
+            WAREHOUSE: products.WAREHOUSE,
+            WEIGHT_SENSITIVE: products.WEIGHT_SENSITIVE,
+            flag_cc: products.flag_cc,
+            QUANTITY: QTY
+          });
+        });
+        const cars = realm.objects("Product");
+        console.log("cars", cars.length);
+      })
+      .catch(error => {
+        console.log("realm error", error);
+      });
+
+    //   this.products.ALT_UNITS = products.ALT_UNITS;
+    //   this.products.AVAILABLE = products.AVAILABLE;
+    //   this.products.BRAND = products.BRAND;
+    //   this.products.CODE = products.CODE;
+    //   this.products.CONVERSATION_FACTOR = products.CONVERSATION_FACTOR;
+    //   this.products.DESCRIPTION = products.DESCRIPTION;
+    //   this.products.DISCOUNT = products.DISCOUNT;
+    //   this.products.LOCATION = products.LOCATION;
+    //   this.products.ON_HAND = products.ON_HAND;
+    //   this.products.ORIGINAL_PRICE = products.ORIGINAL_PRICE;
+    //   this.products.PICTURE_FIELD = products.PICTURE_FIELD;
+    //   this.products.PRICE1 = products.PRICE1;
+    //   this.products.PROD_CLASS = products.PROD_CLASS;
+    //   this.products.PROD_GROUP = products.PROD_GROUP;
+    //   this.products.REWARDS = products.REWARDS;
+    //   this.products.SUBSTITUTE = products.SUBSTITUTE;
+    //   this.products.TAX_CODE1 = products.TAX_CODE1;
+    //   this.products.UNITS = products.UNITS;
+    //   this.products.WAREHOUSE = products.WAREHOUSE;
+    //   this.products.WEIGHT_SENSITIVE = products.WEIGHT_SENSITIVE;
+    //   this.products.flag_cc = products.flag_cc;
+    //   this.products.QUANTITY = QTY;
+
+    //   this.productsArray = this.productsArray.concat(this.products);
+    //   console.log("productsArray", this.productsArray);
+    //   this.index = _.findIndex(this.productsArray, function(o) {
+    //     return o.DESCRIPTION == products.DESCRIPTION;
+    //   });
+    //   console.log("index of repeated product:  ", this.index);
   }
 
   render() {
@@ -238,7 +306,6 @@ class AllProduct extends Component {
             </Text>
           </View>
           <FlatList
-            // bounces={false}
             onMomentumScrollBegin={() => {
               this.onEndReachedCalledDuringMomentum = false;
             }}

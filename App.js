@@ -9,12 +9,12 @@ import Login from "./app/components/screens/Login/Login";
 import Home from "./app/components/screens/Home/Home";
 import Drawer from "./app/components/Drawer/Drawer";
 import PantryList from "./app/components/screens/PantryList/PantryList";
-import Loader from "./app/components/Loader/Loader";
 import Setting from "./app/components/screens/Setting";
 import Cart from "./app/components/screens/Cart";
 import AllProduct from "./app/components/screens/AllProduct";
 import ProductDetail from "./app/components/screens/ProductDetail";
 import SpecialProducts from "./app/components/screens/SpecialProducts";
+import PantryListDragable from "./app/components/screens/PantryListDragable";
 
 const MyApp = createDrawerNavigator(
   {
@@ -77,6 +77,12 @@ const MainStack = createStackNavigator(
     },
     SpecialProducts: {
       screen: SpecialProducts,
+      navigationOptions: {
+        header: null
+      }
+    },
+    PantryListDragable: {
+      screen: PantryListDragable,
       navigationOptions: {
         header: null
       }

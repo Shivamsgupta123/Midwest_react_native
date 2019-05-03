@@ -78,5 +78,44 @@ export default (styles = StyleSheet.create({
     paddingTop: 5,
     paddingHorizontal: 5,
     fontWeight: "500"
+  },
+  HeaderContainer2: {
+    flex: 1,
+    // height: "6%",
+    width: "97%",
+    flexDirection: "row",
+    marginLeft: 5,
+    justifyContent: "center",
+    alignItems: "center"
+  },
+  RowContainer2: {
+    backgroundColor: "white",
+    marginBottom: 3
+  },
+  ProductDescription2: {
+    width: "58%",
+    height: "100%",
+    justifyContent: "center",
+    paddingVertical: 7,
+    borderRightWidth: 1,
+    borderColor: "#afaea8"
+  },
+  QtyContainer2: {
+    height: "97%",
+    width: "25%",
+    backgroundColor: "#afaea8",
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    borderWidth: 1,
+    borderColor: "#afaea8",
+    borderRadius: 7
+    // marginVertical: 2
+  },
+  QtyButton2: {
+    height: "100%",
+    width: "33.3%",
+    justifyContent: "center",
+    alignItems: "center"
   }
 }));

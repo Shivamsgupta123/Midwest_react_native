@@ -7,8 +7,7 @@ import {
   TouchableOpacity,
   Alert,
   FlatList,
-  AsyncStorage,
-  ActivityIndicator
+  AsyncStorage
 } from "react-native";
 import styles from "./Styles";
 import Icon from "react-native-vector-icons/FontAwesome";
@@ -17,6 +16,7 @@ import { StackActions, NavigationActions } from "react-navigation";
 import Loader from "../../Loader/Loader";
 import Header from "../../Header/Header";
 import PantryRow from "../PantryRow/PantryRow";
+import DraggableFlatList from "react-native-draggable-flatlist";
 
 export default class PantryList extends Component {
   constructor(props) {
@@ -24,21 +24,66 @@ export default class PantryList extends Component {
     this.state = {
       Lock: true,
       Loading: false,
-      UserInfo: { Description: "Cheese sliced 50kg", Unit: "Each" },
       SearchText: "",
-      Data: [],
-      TotalProduct: 1,
-      MaxPage: "",
-      Page: 1,
-      Limit: 0
+      // Data: [],
+      data: [...this.props.navigation.state.params].map((d, index) => ({
+        key: `item-${index}`,
+        label: d,
+        backgroundColor: `rgb(${Math.floor(Math.random() * 255)}, ${index *
+          5}, ${132})`
+      }))
     };
     this.UserInfo = "";
-    console.log("pantry list props", this.props);
+    console.log("pantry list props", this.props.navigation.state.params);
   }
-
+  renderItem = ({ item, index, move, moveEnd, isActive }) => {
+    console.log("item", item.label.Details.DESCRIPTION);
+    return (
+      <TouchableOpacity
+        style={[styles.HeaderContainer1, styles.RowContainer]}
+        activeOpacity={1}
+        onLongPress={move}
+        onPressOut={moveEnd}
+        // onLongPress={() =>
+        //   this.props.navigation.navigate("ProductDetail", this.props.Details)
+        // }
+      >
+        <View style={styles.ProductDescription}>
+          <Text numberOfLines={1} style={{ marginLeft: 5 }}>
+            {item.label.Details.DESCRIPTION}
+          </Text>
+        </View>
+        <View
+          style={[
+            styles.ProductDescription,
+            { width: "17%", alignItems: "center" }
+          ]}
+        >
+          <Text>{item.label.Details.UNITS}</Text>
+        </View>
+        <View style={styles.QtyContainer}>
+          <TouchableOpacity
+            style={styles.QtyButton}
+            onPress={products => this.subQty(item)}
+          >
+            <Text style={{ fontSize: 22 }}>-</Text>
+          </TouchableOpacity>
+          <View style={[styles.QtyButton, { backgroundColor: "white" }]}>
+            <Text style={{ fontSize: 18 }}>{this.state.Qty}</Text>
+          </View>
+          <TouchableOpacity
+            style={styles.QtyButton}
+            onPress={() => this.addQty(item)}
+          >
+            <Text style={{ fontSize: 22 }}>+</Text>
+          </TouchableOpacity>
+        </View>
+      </TouchableOpacity>
+    );
+  };
   async componentDidMount() {
     this.UserInfo = JSON.parse(await AsyncStorage.getItem("UserInfo"));
-    this.fetchResult();
+    // this.fetchResult();
   }
   logOut() {
     AsyncStorage.removeItem("UserInfo");
@@ -50,38 +95,24 @@ export default class PantryList extends Component {
   }
 
   async fetchResult() {
-    if (this.state.Limit <= this.state.TotalProduct) {
-      console.log("USER INFO", this.UserInfo);
-      this.setState({ Loading: true });
-      var url =
-        "https://www.scmcentral.com.au/webservices_midwest/myscmapp/profile_products.php?code=" +
+    console.log("USER INFO", this.UserInfo);
+    this.setState({ Loading: true });
+    fetch(
+      "https://www.scmcentral.com.au/webservices_midwest/myscmapp/profile_products.php?code=" +
         this.UserInfo.Debtorid +
-        "&page=" +
-        this.state.Page +
-        "&limit=20&warehouse=" +
-        this.UserInfo.warehouse;
-      console.log("pantrylist url", url);
-      fetch(url)
-        .then(response => response.json())
-        .then(response => {
-          if (response.profilecount != 0) {
-            this.setState({
-              Data: this.state.Data.concat(response.profile),
-              Loading: false,
-              Page: this.state.Page + 1,
-              Limit: this.state.Limit + 20,
-              TotalProduct: response.profilecount
-            });
-          } else {
-            this.setState({ Loading: false, TotalProduct: 0 });
-          }
-        })
-        .catch(error => {
-          this.setState({ Loading: false });
-          alert("Try again Later");
-          console.log(error);
-        });
-    } else alert("No more product to show");
+        "&page=0&limit=20&warehouse=" +
+        this.UserInfo.warehouse
+    )
+      .then(response => response.json())
+      .then(response => {
+        this.setState({ Data: response.profile, Loading: false });
+        console.log("Pantry List", this.state.Data);
+      })
+      .catch(error => {
+        this.setState({ Loading: false });
+        alert("Try again Later");
+        console.log(error);
+      });
   }
 
   search(value) {
@@ -126,20 +157,16 @@ export default class PantryList extends Component {
             </View>
           </View>
           <View style={styles.SearchContainer}>
-            <View style={{ flex: 1 }}>
-              <Image source={require("../../../assets/Images/search.png")} />
-            </View>
+            <Image source={require("../../../assets/Images/search.png")} />
             {/* <View style={{ width: 5, backgroundColor: "red" }} /> */}
-            <View style={{ flex: 9 }}>
-              <TextInput
-                placeholder="Search Here"
-                style={{ marginLeft: 5 }}
-                onChangeText={text => this.setState({ SearchText: text })}
-                onChange={() => {
-                  return <PantryRow search={this.state.SearchText} />;
-                }}
-              />
-            </View>
+            <TextInput
+              placeholder="Search Here"
+              style={{ marginLeft: 5 }}
+              onChangeText={text => this.setState({ SearchText: text })}
+              onChange={() => {
+                return <PantryRow search={this.state.SearchText} />;
+              }}
+            />
           </View>
           <View style={styles.HeaderContainer}>
             <Text style={styles.HeaderText}>Description</Text>
@@ -177,35 +204,19 @@ export default class PantryList extends Component {
               </TouchableOpacity>
             )}
           </View>
-
-          <FlatList
-            onMomentumScrollBegin={() => {
-              this.onEndReachedCalledDuringMomentum = false;
-            }}
-            onEndReached={() => {
-              if (!this.onEndReachedCalledDuringMomentum) {
-                this.fetchResult();
-                this.onEndReachedCalledDuringMomentum = true;
-              }
-            }}
-            onEndReachedThreshold={0.5}
-            data={this.state.Data}
-            style={{ flex: 1 }}
-            renderItem={({ item }) => {
-              return <PantryRow {...item} {...this.props} />;
-            }}
-            keyExtractor={(item, index) => "" + index}
-          />
-        </View>
-        <View style={styles.LoaderContainer}>
           {this.state.Loading ? (
-            <ActivityIndicator color="#a3d17d" size="large" />
+            <Loader isGreen={true} />
           ) : (
-            <Text style={styles.Text}>
-              Total Products {this.state.TotalProduct}
-            </Text>
+            <DraggableFlatList
+              data={this.state.data}
+              renderItem={this.renderItem}
+              keyExtractor={(item, index) => `draggable-item-${item.key}`}
+              scrollPercent={5}
+              onMoveEnd={({ data }) => this.setState({ data })}
+            />
           )}
         </View>
+
         <View style={styles.ButtonContainer}>
           <TouchableOpacity style={styles.Buttons}>
             <Text style={styles.ButtonText}>Add To Cart</Text>
@@ -220,16 +231,4 @@ export default class PantryList extends Component {
       </View>
     );
   }
-}
-
-{
-  /* <FlatList
-data={this.state.Data.profile}
-renderItem={({ item }) => (
-  // <View style={{ height: "50%" }}>
-  <PantryRow />
-  // </View>
-)}
-keyExtractor={(item, index) => "" + index}
-/> */
 }

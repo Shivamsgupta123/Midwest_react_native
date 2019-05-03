@@ -17,29 +17,85 @@ import { StackActions, NavigationActions } from "react-navigation";
 import Loader from "../../Loader/Loader";
 import Header from "../../Header/Header";
 import PantryRow from "../PantryRow/PantryRow";
+import DraggableFlatList from "react-native-draggable-flatlist";
 
-export default class PantryList extends Component {
+export default class PantryListDragable extends Component {
   constructor(props) {
     super(props);
     this.state = {
       Lock: true,
       Loading: false,
-      UserInfo: { Description: "Cheese sliced 50kg", Unit: "Each" },
       SearchText: "",
-      Data: [],
+      data: [...this.props.navigation.state.params].map((d, index) => ({
+        key: `item-${index}`,
+        label: d,
+        backgroundColor: `rgb(${Math.floor(Math.random() * 255)}, ${index *
+          5}, ${132})`
+      })),
       TotalProduct: 1,
-      MaxPage: "",
       Page: 1,
-      Limit: 0
+      Qty: 1
     };
     this.UserInfo = "";
-    console.log("pantry list props", this.props);
+    console.log("pantry list drag props", this.props);
+  }
+  async addQty(item, index) {
+    console.log("addqty", item, index);
+    await this.setState({ Qty: this.state.Qty + 1 });
+  }
+  subQty(item, index) {
+    console.log("subqty", item, index);
+    this.setState({ Qty: this.state.Qty - 1 });
   }
 
-  async componentDidMount() {
-    this.UserInfo = JSON.parse(await AsyncStorage.getItem("UserInfo"));
-    this.fetchResult();
-  }
+  renderItem = ({ item, index, move, moveEnd, isActive }) => {
+    console.log("length", this.state.Qty.length);
+    // console.log("item", item);
+    // console.log("index", index);
+    return (
+      <TouchableOpacity
+        style={[styles.HeaderContainer2, styles.RowContainer2]}
+        activeOpacity={1}
+        onLongPress={move}
+        onPressOut={moveEnd}
+        // onLongPress={() =>
+        //   this.props.navigation.navigate("ProductDetail", this.props.Details)
+        // }
+      >
+        <View style={styles.ProductDescription2}>
+          <Text numberOfLines={1} style={{ marginLeft: 5 }}>
+            {item.label.Details.DESCRIPTION}
+          </Text>
+        </View>
+        <View
+          style={[
+            styles.ProductDescription2,
+            { width: "17%", alignItems: "center" }
+          ]}
+        >
+          <Text>{item.label.Details.UNITS}</Text>
+        </View>
+        <View style={styles.QtyContainer2}>
+          <TouchableOpacity
+            style={styles.QtyButton2}
+            onPress={() => this.subQty(item, index)}
+          >
+            <Text style={{ fontSize: 22 }}>-</Text>
+          </TouchableOpacity>
+          <View style={[styles.QtyButton2, { backgroundColor: "white" }]}>
+            <Text style={{ fontSize: 18 }}>{index}</Text>
+          </View>
+          <TouchableOpacity
+            style={styles.QtyButton2}
+            onPress={() => this.addQty(item, index)}
+          >
+            <Text style={{ fontSize: 22 }}>+</Text>
+          </TouchableOpacity>
+        </View>
+      </TouchableOpacity>
+    );
+  };
+
   logOut() {
     AsyncStorage.removeItem("UserInfo");
     const resetAction = StackActions.reset({
@@ -48,40 +104,9 @@ export default class PantryList extends Component {
     });
     this.props.navigation.dispatch(resetAction);
   }
-
-  async fetchResult() {
-    if (this.state.Limit <= this.state.TotalProduct) {
-      console.log("USER INFO", this.UserInfo);
-      this.setState({ Loading: true });
-      var url =
-        "https://www.scmcentral.com.au/webservices_midwest/myscmapp/profile_products.php?code=" +
-        this.UserInfo.Debtorid +
-        "&page=" +
-        this.state.Page +
-        "&limit=20&warehouse=" +
-        this.UserInfo.warehouse;
-      console.log("pantrylist url", url);
-      fetch(url)
-        .then(response => response.json())
-        .then(response => {
-          if (response.profilecount != 0) {
-            this.setState({
-              Data: this.state.Data.concat(response.profile),
-              Loading: false,
-              Page: this.state.Page + 1,
-              Limit: this.state.Limit + 20,
-              TotalProduct: response.profilecount
-            });
-          } else {
-            this.setState({ Loading: false, TotalProduct: 0 });
-          }
-        })
-        .catch(error => {
-          this.setState({ Loading: false });
-          alert("Try again Later");
-          console.log(error);
-        });
-    } else alert("No more product to show");
+  async isLock() {
+    await this.setState({ Lock: !this.state.Lock });
+    console.log("lock", this.state.Lock);
   }
 
   search(value) {
@@ -94,7 +119,7 @@ export default class PantryList extends Component {
       <View style={styles.Container}>
         <View style={styles.SubConatiner}>
           <Header
-            title={"Pantry List"}
+            title={"Pantry List Dragable"}
             leftIcon={true}
             action={() => this.props.navigation.goBack()}
             LogoutAction={() => {
@@ -129,7 +154,7 @@ export default class PantryList extends Component {
             <View style={{ flex: 1 }}>
               <Image source={require("../../../assets/Images/search.png")} />
             </View>
-            {/* <View style={{ width: 5, backgroundColor: "red" }} /> */}
+
             <View style={{ flex: 9 }}>
               <TextInput
                 placeholder="Search Here"
@@ -162,14 +187,14 @@ export default class PantryList extends Component {
               Qty
             </Text>
             {this.state.Lock ? (
-              <TouchableOpacity onPress={() => this.setState({ Lock: false })}>
+              <TouchableOpacity onPress={() => this.isLock()}>
                 <Image
                   style={{ width: 20, height: "100%" }}
                   source={require("../../../assets/Images/locked.png")}
                 />
               </TouchableOpacity>
             ) : (
-              <TouchableOpacity onPress={() => this.setState({ Lock: true })}>
+              <TouchableOpacity onPress={() => this.isLock()}>
                 <Image
                   style={{ width: 30, height: "100%" }}
                   source={require("../../../assets/Images/unlocked.png")}
@@ -177,24 +202,12 @@ export default class PantryList extends Component {
               </TouchableOpacity>
             )}
           </View>
-
-          <FlatList
-            onMomentumScrollBegin={() => {
-              this.onEndReachedCalledDuringMomentum = false;
-            }}
-            onEndReached={() => {
-              if (!this.onEndReachedCalledDuringMomentum) {
-                this.fetchResult();
-                this.onEndReachedCalledDuringMomentum = true;
-              }
-            }}
-            onEndReachedThreshold={0.5}
-            data={this.state.Data}
-            style={{ flex: 1 }}
-            renderItem={({ item }) => {
-              return <PantryRow {...item} {...this.props} />;
-            }}
-            keyExtractor={(item, index) => "" + index}
+          <DraggableFlatList
+            data={this.state.data}
+            renderItem={this.renderItem}
+            keyExtractor={(item, index) => `draggable-item-${item.key}`}
+            scrollPercent={5}
+            onMoveEnd={({ data }) => this.setState({ data })}
           />
         </View>
         <View style={styles.LoaderContainer}>
@@ -202,7 +215,7 @@ export default class PantryList extends Component {
             <ActivityIndicator color="#a3d17d" size="large" />
           ) : (
             <Text style={styles.Text}>
-              Total Products {this.state.TotalProduct}
+              Total Products {this.props.navigation.state.params.length}
             </Text>
           )}
         </View>
@@ -220,16 +233,4 @@ export default class PantryList extends Component {
       </View>
     );
   }
-}
-
-{
-  /* <FlatList
-data={this.state.Data.profile}
-renderItem={({ item }) => (
-  // <View style={{ height: "50%" }}>
-  <PantryRow />
-  // </View>
-)}
-keyExtractor={(item, index) => "" + index}
-/> */
 }
