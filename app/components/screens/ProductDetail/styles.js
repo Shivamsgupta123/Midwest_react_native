@@ -43,6 +43,7 @@ export default (styles = StyleSheet.create({
   },
   Text: { marginLeft: 5, fontSize: 16, fontWeight: "500" },
   Image: {
+    // top: 0,
     height: "100%",
     width: "100%"
   },

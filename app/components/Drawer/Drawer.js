@@ -3,8 +3,9 @@ import { View, Text, Image, AsyncStorage } from "react-native";
 import styles from "./Styles";
 import { TouchableOpacity } from "react-native-gesture-handler";
 import Loader from "../Loader/Loader";
+import { changeData } from "../../Global";
 
-export default class NoticeBoard extends Component {
+export default class Drawer extends Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -15,7 +16,7 @@ export default class NoticeBoard extends Component {
   }
   async componentDidMount() {
     this.UserInfo = JSON.parse(await AsyncStorage.getItem("UserInfo"));
-    this.fetchResult();
+    // this.fetchResult();
   }
   async fetchResult() {
     console.log("USER INFO", this.UserInfo);
@@ -34,7 +35,8 @@ export default class NoticeBoard extends Component {
             Data: response.profile,
             Loading: false
           });
-          console.log("drawer data", this.state.Data);
+          changeData(this.state.Data);
+          // console.log("drawer data", this.state.Data);
         } else {
           this.setState({ Loading: false });
         }

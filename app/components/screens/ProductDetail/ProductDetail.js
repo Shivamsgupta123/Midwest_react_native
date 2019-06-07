@@ -36,8 +36,11 @@ class ProductDetail extends Component {
     this.props.navigation.dispatch(resetAction);
   }
   async subQty(products) {
-    if (this.state.Qty != 0) await this.setState({ Qty: this.state.Qty - 1 });
-    console.log("products - qty", products, this.state.Qty);
+    if (this.state.Qty <= 0) return;
+    else {
+      await this.setState({ Qty: this.state.Qty - 1 });
+      console.log("products - qty", products, this.state.Qty);
+    }
   }
   async addQty(products) {
     await this.setState({ Qty: this.state.Qty + 1 });
@@ -74,10 +77,17 @@ class ProductDetail extends Component {
             }}
             CartAction={() => this.props.navigation.navigate("Cart")}
           />
+
           <View style={styles.ImageContainer}>
             <View style={styles.ImageWrapper}>
+              {console.log("params.PICTURE_FIELD", params.PICTURE_FIELD)}
+
               <Image
-                source={require("../../../assets/Images/no-image.jpeg")}
+                source={{
+                  uri:
+                    "https://www.scmcentral.com.au/webservices_midwest/images/" +
+                    params.PICTURE_FIELD
+                }}
                 style={styles.Image}
               />
             </View>

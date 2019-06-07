@@ -1,7 +1,6 @@
 import React, { Component } from "react";
 import { View, Text, TouchableOpacity } from "react-native";
 import styles from "./Styles";
-// import Loader from "../../Loader/Loader";
 
 export default class PantryRow extends Component {
   constructor(props) {
@@ -14,11 +13,11 @@ export default class PantryRow extends Component {
   }
   async subQty(products) {
     if (this.state.Qty != 0) await this.setState({ Qty: this.state.Qty - 1 });
-    console.log("products - qty", products, this.state.Qty);
+    this.props.onPress(products, this.state.Qty);
   }
   async addQty(products) {
     await this.setState({ Qty: this.state.Qty + 1 });
-    console.log("products + qty", products, this.state.Qty);
+    this.props.onPress(products, this.state.Qty);
   }
 
   render() {
@@ -26,8 +25,10 @@ export default class PantryRow extends Component {
       <TouchableOpacity
         style={[styles.HeaderContainer, styles.RowContainer]}
         activeOpacity={1}
-        onLongPress={() =>
-          this.props.navigation.navigate("ProductDetail", this.props.Details)
+        onLongPress={
+          this.props.Lock
+            ? () => this.props.navigate("ProductDetail", this.props.Details)
+            : () => this.props.onLongPress()
         }
       >
         <View style={styles.ProductDescription}>

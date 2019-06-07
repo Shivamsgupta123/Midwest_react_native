@@ -9,6 +9,7 @@ import {
   Text,
   TextInput,
   Image,
+  LayoutAnimation,
   TouchableOpacity,
   Alert,
   FlatList,
@@ -21,10 +22,22 @@ import ProductRow from "../ProductRow";
 import _ from "lodash";
 import styles from "./styles";
 const Realm = require("realm");
+import * as color from "../../../utils/Color";
 /**
  * AllProduct class
  * @class
  */
+
+var CustomLayoutLinear = {
+  duration: 1000,
+  create: {
+    type: LayoutAnimation.Types.linear,
+    property: LayoutAnimation.Properties.opacity
+  },
+  update: {
+    type: LayoutAnimation.Types.curveEaseInEaseOut
+  }
+};
 
 class AllProduct extends Component {
   constructor(props) {
@@ -128,6 +141,8 @@ class AllProduct extends Component {
         .then(response => {
           console.log("URL", url);
           if (response.total != 0) {
+            LayoutAnimation.configureNext(CustomLayoutLinear);
+
             this.setState({
               Data: this.state.Data.concat(response.products),
               Loading: false,
@@ -270,20 +285,17 @@ class AllProduct extends Component {
             }}
             CartAction={() => this.props.navigation.navigate("Cart")}
           />
-          <View style={styles.SearchContainer}>
+          <TouchableOpacity
+            style={styles.SearchContainer}
+            onPress={() => this.props.navigation.navigate("SearchProduct")}
+          >
             <View style={{ flex: 1 }}>
               <Image source={require("../../../assets/Images/search.png")} />
             </View>
             <View style={{ flex: 9 }}>
-              <TextInput
-                placeholder="Search Here"
-                style={{}}
-                onChangeText={text => this.setState({ SearchText: text })}
-                // onChange={text => this.search(text)}
-                numberOfLines={1}
-              />
+              <Text style={{ color: color.LightGrey }}>Search here</Text>
             </View>
-          </View>
+          </TouchableOpacity>
           <View style={styles.HeaderContainer}>
             <Text style={styles.HeaderText}>Description</Text>
             <Text

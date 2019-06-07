@@ -2,22 +2,19 @@ import React, { Component } from "react";
 import {
   View,
   Text,
-  TextInput,
   Image,
   TouchableOpacity,
   Alert,
-  FlatList,
   AsyncStorage,
   ActivityIndicator
 } from "react-native";
 import styles from "./Styles";
-import Icon from "react-native-vector-icons/FontAwesome";
-// import { CheckBox } from "native-base";
 import { StackActions, NavigationActions } from "react-navigation";
-import Loader from "../../Loader/Loader";
 import Header from "../../Header/Header";
 import PantryRow from "../PantryRow/PantryRow";
 import DraggableFlatList from "react-native-draggable-flatlist";
+import { ProductList, changeData } from "../../../Global";
+import * as color from "../../../utils/Color";
 
 export default class PantryListDragable extends Component {
   constructor(props) {
@@ -26,7 +23,7 @@ export default class PantryListDragable extends Component {
       Lock: true,
       Loading: false,
       SearchText: "",
-      data: [...this.props.navigation.state.params].map((d, index) => ({
+      data: [...ProductList].map((d, index) => ({
         key: `item-${index}`,
         label: d,
         backgroundColor: `rgb(${Math.floor(Math.random() * 255)}, ${index *
@@ -37,64 +34,17 @@ export default class PantryListDragable extends Component {
       Qty: 1
     };
     this.UserInfo = "";
-    console.log("pantry list drag props", this.props);
+    console.log("ProductList", ProductList);
+    // console.log("pantry list drag props", this.props);
   }
-  async addQty(item, index) {
+  addQty(item, index) {
     console.log("addqty", item, index);
-    await this.setState({ Qty: this.state.Qty + 1 });
+    this.setState({ Qty: this.state.Qty + 1 });
   }
   subQty(item, index) {
     console.log("subqty", item, index);
     this.setState({ Qty: this.state.Qty - 1 });
   }
-
-  renderItem = ({ item, index, move, moveEnd, isActive }) => {
-    console.log("length", this.state.Qty.length);
-    // console.log("item", item);
-    // console.log("index", index);
-    return (
-      <TouchableOpacity
-        style={[styles.HeaderContainer2, styles.RowContainer2]}
-        activeOpacity={1}
-        onLongPress={move}
-        onPressOut={moveEnd}
-        // onLongPress={() =>
-        //   this.props.navigation.navigate("ProductDetail", this.props.Details)
-        // }
-      >
-        <View style={styles.ProductDescription2}>
-          <Text numberOfLines={1} style={{ marginLeft: 5 }}>
-            {item.label.Details.DESCRIPTION}
-          </Text>
-        </View>
-        <View
-          style={[
-            styles.ProductDescription2,
-            { width: "17%", alignItems: "center" }
-          ]}
-        >
-          <Text>{item.label.Details.UNITS}</Text>
-        </View>
-        <View style={styles.QtyContainer2}>
-          <TouchableOpacity
-            style={styles.QtyButton2}
-            onPress={() => this.subQty(item, index)}
-          >
-            <Text style={{ fontSize: 22 }}>-</Text>
-          </TouchableOpacity>
-          <View style={[styles.QtyButton2, { backgroundColor: "white" }]}>
-            <Text style={{ fontSize: 18 }}>{index}</Text>
-          </View>
-          <TouchableOpacity
-            style={styles.QtyButton2}
-            onPress={() => this.addQty(item, index)}
-          >
-            <Text style={{ fontSize: 22 }}>+</Text>
-          </TouchableOpacity>
-        </View>
-      </TouchableOpacity>
-    );
-  };
 
   logOut() {
     AsyncStorage.removeItem("UserInfo");
@@ -112,6 +62,9 @@ export default class PantryListDragable extends Component {
   search(value) {
     console.log("search text", this.state.SearchText);
     // <PantryRow search={this.state.SearchText} />;
+  }
+  editQty(products, QTY) {
+    console.log("All product increase qty", products, QTY);
   }
 
   render() {
@@ -155,16 +108,13 @@ export default class PantryListDragable extends Component {
               <Image source={require("../../../assets/Images/search.png")} />
             </View>
 
-            <View style={{ flex: 9 }}>
-              <TextInput
-                placeholder="Search Here"
-                style={{ marginLeft: 5 }}
-                onChangeText={text => this.setState({ SearchText: text })}
-                onChange={() => {
-                  return <PantryRow search={this.state.SearchText} />;
-                }}
-              />
-            </View>
+            <TouchableOpacity
+              style={{ flex: 9 }}
+              onPressOut={() => this.props.navigation.navigate("SearchProduct")}
+              activeOpacity={1}
+            >
+              <Text style={{ color: color.ProductlistFont }}>Search here</Text>
+            </TouchableOpacity>
           </View>
           <View style={styles.HeaderContainer}>
             <Text style={styles.HeaderText}>Description</Text>
@@ -204,11 +154,25 @@ export default class PantryListDragable extends Component {
           </View>
           <DraggableFlatList
             data={this.state.data}
-            renderItem={this.renderItem}
+            renderItem={({ item, index, move, moveEnd, isActive }) => {
+              return (
+                <PantryRow
+                  {...item.label}
+                  {...this.props.navigation}
+                  onLongPress={move}
+                  onPress={(products, QTY) => this.editQty(products, QTY)} // receiving data(products, QTY)    from child (for increase qty)
+                  Lock={this.state.Lock}
+                />
+              );
+            }}
             keyExtractor={(item, index) => `draggable-item-${item.key}`}
             scrollPercent={5}
-            onMoveEnd={({ data }) => this.setState({ data })}
+            onMoveEnd={({ data }) => {
+              // this.setState({ data });
+              // changeData(data.label);
+            }}
           />
+          {/* {console.log("data", this.state.data)} */}
         </View>
         <View style={styles.LoaderContainer}>
           {this.state.Loading ? (

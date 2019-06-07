@@ -1,22 +1,25 @@
 import React, { Component } from "react";
-import { View, Text, TouchableOpacity, AsyncStorage } from "react-native";
+import { View, Text, TouchableOpacity } from "react-native";
+import * as color from "../../../utils/Color";
 import styles from "./styles";
-// import Loader from "../../Loader/Loader";
 
 export default class ProductRow extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      Loading: false,
       Data: [],
-      Qty: 0,
-      count: 0
+      Qty: 0
     };
+    // console.log("product row props", this.props.Data);
   }
 
   async subQty(products) {
-    if (this.state.Qty != 0) await this.setState({ Qty: this.state.Qty - 1 });
-    this.props.onPress1(products, this.state.Qty);
+    if (this.state.Qty <= 0) {
+      return;
+    }
+    this.setState({ Qty: this.state.Qty - 1 }, () =>
+      this.props.onPress1(products, this.state.Qty)
+    );
   }
 
   async addQty(products) {
@@ -26,18 +29,33 @@ export default class ProductRow extends Component {
     this.props.onPress(products, this.state.Qty); // passing data to Parents
   }
 
+  navigateTOProductDetail = () => {
+    this.props.navigation.navigate("ProductDetail", this.props.Data);
+  };
+
   render() {
     return (
       <TouchableOpacity
         style={[styles.HeaderContainer, styles.RowContainer]}
         activeOpacity={1}
-        onLongPress={
-          // () => console.log("longed pressed", this.props.Data.DESCRIPTION)
-          () => this.props.navigation.navigate("ProductDetail", this.props.Data)
-        }
+        onLongPress={this.navigateTOProductDetail}
       >
+        {console.log("avail", parseInt(this.props.Data.AVAILABLE))}
+        {parseInt(this.props.Data.AVAILABLE) <= 0 ? (
+          <View style={styles.NotAvailableWrapper}>
+            <Text style={{ fontSize: 10 }}>Not available</Text>
+          </View>
+        ) : null}
+
         <View style={styles.ProductDescription}>
-          <Text numberOfLines={1} style={{ marginLeft: 5 }}>
+          <Text
+            numberOfLines={1}
+            style={{
+              color:
+                this.props.Data.REWARDS == "GOLD" ? color.RewardGreen : "black",
+              marginLeft: 5
+            }}
+          >
             {this.props.Data.DESCRIPTION}
           </Text>
         </View>

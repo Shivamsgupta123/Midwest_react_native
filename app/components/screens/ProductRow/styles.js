@@ -11,6 +11,7 @@ export default (styles = StyleSheet.create({
     marginLeft: 5,
     justifyContent: "center",
     alignItems: "center"
+    // paddingVertical: 5
   },
   RowContainer: {
     backgroundColor: "white",
@@ -38,8 +39,17 @@ export default (styles = StyleSheet.create({
     width: "58%",
     height: "100%",
     justifyContent: "center",
+    // alignItems: "flex-end",
     paddingVertical: 7,
     borderRightWidth: 1,
     borderColor: "#afaea8"
+  },
+  NotAvailableWrapper: {
+    position: "absolute",
+    zIndex: 100,
+    backgroundColor: "red",
+    top: 0,
+    left: 0,
+    borderBottomRightRadius: 10
   }
 }));

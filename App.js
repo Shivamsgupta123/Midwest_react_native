@@ -15,6 +15,7 @@ import AllProduct from "./app/components/screens/AllProduct";
 import ProductDetail from "./app/components/screens/ProductDetail";
 import SpecialProducts from "./app/components/screens/SpecialProducts";
 import PantryListDragable from "./app/components/screens/PantryListDragable";
+import SearchProduct from "./app/components/screens/SearchProduct";
 
 const MyApp = createDrawerNavigator(
   {
@@ -86,6 +87,12 @@ const MainStack = createStackNavigator(
       navigationOptions: {
         header: null
       }
+    },
+    SearchProduct: {
+      screen: SearchProduct,
+      navigationOptions: {
+        header: null
+      }
     }
   },
   {
@@ -128,19 +135,22 @@ export default class App extends Component {
       loggedIn: false,
       loading: false
     };
+    this.UserInfo = "";
     // this.token = "";
     //   this.token = AsyncStorage.getItem("UserInfo");
   }
 
-  // componentDidMount() {
-  //   AsyncStorage.getItem("UserInfo").then(
-  //     value => this.setState({ Loading: false }),
-  //     // if(value== null)
-  //     // {
-  //     this.setState({ loggedIn: false })
-  //     // }
-  //   );
-  // }
+  async componentDidMount() {
+    this.UserInfo = JSON.parse(await AsyncStorage.getItem("UserInfo"));
+    alert(this.UserInfo.warehouse);
+    //   AsyncStorage.getItem("UserInfo").then(
+    //     value => this.setState({ Loading: false }),
+    //     // if(value== null)
+    //     // {
+    //     this.setState({ loggedIn: false })
+    //     // }
+    //   );
+  }
 
   render() {
     return <RootStack />;
