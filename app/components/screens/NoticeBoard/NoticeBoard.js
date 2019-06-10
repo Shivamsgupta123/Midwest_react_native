@@ -7,7 +7,7 @@ import {
   TouchableOpacity,
   Animated
 } from "react-native";
-import Pie from "react-native-pie";
+import PieChart from "../../PieChart";
 import styles from "./Styles";
 
 export default class NoticeBoard extends Component {
@@ -42,12 +42,7 @@ export default class NoticeBoard extends Component {
       <View style={styles.container}>
         <View style={styles.PieChartContainer}>
           <View style={styles.ChartWrapper}>
-            <Pie
-              radius={70}
-              innerRadius={40}
-              series={[100]}
-              colors={[this.state.Color]}
-            />
+            <PieChart color={this.state.Color} />
             <Text style={styles.Total}>{this.state.Value}</Text>
             {this.state.Color == "#A52A2A" ? (
               <View

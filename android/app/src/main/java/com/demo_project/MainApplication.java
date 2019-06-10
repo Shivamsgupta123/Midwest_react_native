@@ -4,9 +4,6 @@ import android.app.Application;
 
 import com.facebook.react.ReactApplication;
 import io.realm.react.RealmReactPackage;
-import com.rumax.reactnative.pdfviewer.PDFViewPackage;
-import com.RNFetchBlob.RNFetchBlobPackage;
-import org.wonday.pdf.RCTPdfView;
 import com.oblador.vectoricons.VectorIconsPackage;
 import com.swmansion.gesturehandler.react.RNGestureHandlerPackage;
 import com.facebook.react.ReactNativeHost;
@@ -30,9 +27,6 @@ public class MainApplication extends Application implements ReactApplication {
       return Arrays.<ReactPackage>asList(
           new MainReactPackage(),
             new RealmReactPackage(),
-            new PDFViewPackage(),
-            new RNFetchBlobPackage(),
-            new RCTPdfView(),
             new VectorIconsPackage(),
             new RNGestureHandlerPackage()
       );

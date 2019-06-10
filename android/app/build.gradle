@@ -139,9 +139,6 @@ android {
 
 dependencies {
     implementation project(':realm')
-    implementation project(':react-native-view-pdf')
-    implementation project(':rn-fetch-blob')
-    implementation project(':react-native-pdf')
     implementation project(':react-native-vector-icons')
     implementation project(':react-native-gesture-handler')
     implementation fileTree(dir: "libs", include: ["*.jar"])
@@ -154,8 +151,4 @@ dependencies {
 task copyDownloadableDepsToLibs(type: Copy) {
     from configurations.compile
     into 'libs'
-}
-
-task wrapper(type: Wrapper) {
-    gradleVersion = '2.0'
 }

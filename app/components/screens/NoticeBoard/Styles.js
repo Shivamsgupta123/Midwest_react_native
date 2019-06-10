@@ -25,7 +25,7 @@ export default (styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center"
   },
-  Total: { position: "absolute", top: 70 },
+  Total: { position: "absolute", top: 80 },
   ButtonWrapper: {
     flexDirection: "row",
     justifyContent: "space-between",
@@ -41,13 +41,13 @@ export default (styles = StyleSheet.create({
     borderStyle: "solid",
     borderLeftWidth: 30,
     borderRightWidth: 30,
-    borderBottomWidth: 60,
+    borderBottomWidth: 40,
     borderLeftColor: "transparent",
     borderRightColor: "transparent",
     borderBottomColor: "#A52A2A",
     transform: [{ rotate: "120deg" }],
     position: "absolute",
-    left: 120,
+    left: 130,
     top: 100
   },
   triangleCur: {
@@ -57,14 +57,14 @@ export default (styles = StyleSheet.create({
     borderStyle: "solid",
     borderLeftWidth: 30,
     borderRightWidth: 30,
-    borderBottomWidth: 60,
+    borderBottomWidth: 40,
     borderLeftColor: "transparent",
     borderRightColor: "transparent",
     borderBottomColor: "#25ed36",
     transform: [{ rotate: "60deg" }],
     position: "absolute",
-    left: 135,
-    top: 10
+    left: 128,
+    top: 30
   },
   triangleOv60: {
     width: 0,
@@ -73,13 +73,13 @@ export default (styles = StyleSheet.create({
     borderStyle: "solid",
     borderLeftWidth: 30,
     borderRightWidth: 30,
-    borderBottomWidth: 60,
+    borderBottomWidth: 40,
     borderLeftColor: "transparent",
     borderRightColor: "transparent",
     borderBottomColor: "#A52A2A",
     transform: [{ rotate: "90deg" }],
     position: "absolute",
-    left: 140
+    left: 135
   },
   triangleOv30: {
     width: 0,
@@ -88,14 +88,14 @@ export default (styles = StyleSheet.create({
     borderStyle: "solid",
     borderLeftWidth: 30,
     borderRightWidth: 30,
-    borderBottomWidth: 60,
+    borderBottomWidth: 40,
     borderLeftColor: "transparent",
     borderRightColor: "transparent",
     borderBottomColor: "#f2a202",
     transform: [{ rotate: "79deg" }],
     position: "absolute",
-    left: 140,
-    top: 30
+    left: 127,
+    top: 40
   },
   triangleOv90: {
     width: 0,
@@ -104,13 +104,13 @@ export default (styles = StyleSheet.create({
     borderStyle: "solid",
     borderLeftWidth: 30,
     borderRightWidth: 30,
-    borderBottomWidth: 60,
+    borderBottomWidth: 40,
     borderLeftColor: "transparent",
     borderRightColor: "transparent",
     borderBottomColor: "red",
-    transform: [{ rotate: "102deg" }],
+    transform: [{ rotate: "105deg" }],
     position: "absolute",
-    left: 130,
+    left: 134,
     top: 83
   }
 }));
